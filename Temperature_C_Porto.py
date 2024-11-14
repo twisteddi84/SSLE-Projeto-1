@@ -60,4 +60,4 @@ if __name__ == '__main__':
     consumer_thread.start()
 
     # Inicia o aplicativo Flask
-    app.run(debug=True, port=port, use_reloader=False)
+    app.run(debug=True, port=port, use_reloader=False,host='0.0.0.0')

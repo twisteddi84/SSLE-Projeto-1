@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 city = "Lisboa"
 
-port = 5000
+port = 5155
 temperature_measure = "F"
 url = f"http://10.151.101.126:{port}/"
 
@@ -61,5 +61,5 @@ if __name__ == '__main__':
     consumer_thread.start()
 
     # Start the Flask app
-    app.run(debug=True, port=port, use_reloader=False)
+    app.run(debug=True, port=port, use_reloader=False, host='0.0.0.0')
     
