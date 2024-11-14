@@ -25,10 +25,17 @@ def sensor_temperatura_simulado():
             celsius = medir_temperatura_celsius()  # Mede a temperatura em Celsius
             fahrenheit = celsius_para_fahrenheit(celsius)  # Converte para Fahrenheit
 
-            # Dicionário para Celsius
-            temperatura_celsius = {
+            # Dicionário para Celsius para Lisboa
+            temperatura_celsius_lisboa = {
                 "type": "C",
                 "value": celsius
+                , "city": "Lisboa"
+            }
+
+            temperatura_celsius_Porto = {
+                "type": "C",
+                "value": celsius + 1
+                , "city": "Porto"
             }
 
             # Dicionário para Fahrenheit
@@ -38,18 +45,22 @@ def sensor_temperatura_simulado():
             }
 
             # Converte os dicionários para JSON
-            message_celsius = json.dumps(temperatura_celsius)
+            message_celsius_lisboa = json.dumps(temperatura_celsius_lisboa)
             message_fahrenheit = json.dumps(temperatura_fahrenheit)
+            message_celsius_porto = json.dumps(temperatura_celsius_Porto)
 
             # Publica a temperatura na exchange 'temperaturas'
-            channel.basic_publish(exchange='temperaturas', routing_key='', body=message_celsius)
-            print(f"Temperatura Celsius enviada: {temperatura_celsius}")
+            channel.basic_publish(exchange='temperaturas', routing_key='', body=message_celsius_lisboa)
+            print(f"Temperatura Celsius Lisboa enviada: {temperatura_celsius_lisboa}")
+
+            channel.basic_publish(exchange='temperaturas', routing_key='', body=message_celsius_porto)
+            print(f"Temperatura Celsius Porto enviada: {temperatura_celsius_Porto}")
 
             # Publica a temperatura na exchange 'temperaturas'
             channel.basic_publish(exchange='temperaturas', routing_key='', body=message_fahrenheit)
             print(f"Temperatura Fahrenheit enviada: {temperatura_fahrenheit}")
 
-            time.sleep(30)  # Aguarda 30 segundos antes da próxima medição
+            time.sleep(10)  # Aguarda 30 segundos antes da próxima medição
     except KeyboardInterrupt:
         print("\nSimulação encerrada.")
     finally:

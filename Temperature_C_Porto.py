@@ -6,8 +6,9 @@ import json
 
 app = Flask(__name__)
 
-port = 5001
+port = 5003
 temperature_measure = "C"
+city = "Porto"
 url = f"http://127.0.0.1:{port}/"
 
 # Variável global para armazenar a última temperatura em Celsius recebida
@@ -18,8 +19,9 @@ def callback_celsius(ch, method, properties, body):
     # Decodifica a mensagem e atualiza a última temperatura em Celsius
     data = json.loads(body.decode())  # Converte de JSON para dicionário
     if data.get("type") == "C":  # Verifica se é temperatura em Celsius
-        latest_temperature_celsius = data.get("value")
-        print(f"Temperatura Celsius recebida: {latest_temperature_celsius} °C")
+        if data.get("city") == city:
+            latest_temperature_celsius = data.get("value")
+            print(f"Temperatura Celsius recebida: {latest_temperature_celsius} °C")
 
 def consume_temperature_celsius():
     # Conecta ao RabbitMQ
@@ -48,7 +50,7 @@ def get_data():
     return jsonify(data)
 
 if __name__ == '__main__':
-    data = {"type": temperature_measure, "url": url}
+    data = {"type": temperature_measure, "city" : city ,  "url": url}
     print(data)
     requests.post("http://127.0.0.1:5020/services", data=data)
 
