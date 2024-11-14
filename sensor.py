@@ -24,6 +24,7 @@ def sensor_temperatura_simulado():
         while True:
             celsius = medir_temperatura_celsius()  # Mede a temperatura em Celsius
             fahrenheit = celsius_para_fahrenheit(celsius)  # Converte para Fahrenheit
+            fahrenheit_porto = celsius_para_fahrenheit(celsius + 1)  # Converte para Fahrenheit
 
             # Dicionário para Celsius para Lisboa
             temperatura_celsius_lisboa = {
@@ -39,15 +40,23 @@ def sensor_temperatura_simulado():
             }
 
             # Dicionário para Fahrenheit
-            temperatura_fahrenheit = {
+            temperatura_fahrenheit_Lisboa = {
                 "type": "F",
                 "value": fahrenheit
+                , "city": "Lisboa"
+            }
+
+            temperatura_fahrenheit_Porto = {
+                "type": "F",
+                "value": fahrenheit_porto
+                , "city": "Porto"
             }
 
             # Converte os dicionários para JSON
             message_celsius_lisboa = json.dumps(temperatura_celsius_lisboa)
-            message_fahrenheit = json.dumps(temperatura_fahrenheit)
+            message_fahrenheit_lisboa = json.dumps(temperatura_celsius_lisboa)
             message_celsius_porto = json.dumps(temperatura_celsius_Porto)
+            message_fahrenheit_porto = json.dumps(temperatura_fahrenheit_Porto)
 
             # Publica a temperatura na exchange 'temperaturas'
             channel.basic_publish(exchange='temperaturas', routing_key='', body=message_celsius_lisboa)
@@ -57,8 +66,11 @@ def sensor_temperatura_simulado():
             print(f"Temperatura Celsius Porto enviada: {temperatura_celsius_Porto}")
 
             # Publica a temperatura na exchange 'temperaturas'
-            channel.basic_publish(exchange='temperaturas', routing_key='', body=message_fahrenheit)
-            print(f"Temperatura Fahrenheit enviada: {temperatura_fahrenheit}")
+            channel.basic_publish(exchange='temperaturas', routing_key='', body=message_fahrenheit_lisboa)
+            print(f"Temperatura Fahrenheit enviada: {temperatura_fahrenheit_Lisboa}")
+
+            channel.basic_publish(exchange='temperaturas', routing_key='', body=message_fahrenheit_porto)
+            print(f"Temperatura Fahrenheit Porto enviada: {temperatura_fahrenheit_Porto}")
 
             time.sleep(10)  # Aguarda 30 segundos antes da próxima medição
     except KeyboardInterrupt:

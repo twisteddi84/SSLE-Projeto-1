@@ -6,6 +6,8 @@ import json
 
 app = Flask(__name__)
 
+city = "Porto"
+
 port = 5000
 temperature_measure = "F"
 url = f"http://127.0.0.1:{port}/"
@@ -18,8 +20,9 @@ def callback_fahrenheit(ch, method, properties, body):
     # Decode the message and update the latest temperature in Fahrenheit
     data = json.loads(body.decode())  # Convert from JSON to dictionary
     if data.get("type") == "F":  # Check if it's temperature in Fahrenheit
-        latest_temperature_fahrenheit = data.get("value")
-        print(f"Temperatura Fahrenheit recebida: {latest_temperature_fahrenheit} °F")
+        if data.get("city") == "Porto":
+            latest_temperature_fahrenheit = data.get("value")
+            print(f"Temperatura Fahrenheit recebida: {latest_temperature_fahrenheit} °F")
 
 def consume_temperature_fahrenheit():
     # Connect to RabbitMQ
@@ -48,7 +51,7 @@ def get_data():
     return jsonify(data)
 
 if __name__ == '__main__':
-    data = {"type": temperature_measure, "url": url}
+    data = {"type": temperature_measure,"city":city ,"url": url}
     print(data)
     requests.post("http://127.0.0.1:5020/services", data=data)
 
