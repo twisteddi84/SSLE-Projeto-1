@@ -14,8 +14,10 @@ def celsius_para_fahrenheit(celsius):
 # Função principal do sensor de temperatura simulado
 def sensor_temperatura_simulado():
     # Conexão com o RabbitMQ
-    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+    credentials = pika.PlainCredentials('myuser', 'mypassword')
+    connection = pika.BlockingConnection(pika.ConnectionParameters('10.151.101.221', credentials=credentials))
     channel = connection.channel()
+
 
     # Declara um exchange do tipo 'fanout'
     channel.exchange_declare(exchange='temperaturas', exchange_type='fanout')
@@ -54,7 +56,7 @@ def sensor_temperatura_simulado():
 
             # Converte os dicionários para JSON
             message_celsius_lisboa = json.dumps(temperatura_celsius_lisboa)
-            message_fahrenheit_lisboa = json.dumps(temperatura_celsius_lisboa)
+            message_fahrenheit_lisboa = json.dumps(temperatura_fahrenheit_Lisboa)
             message_celsius_porto = json.dumps(temperatura_celsius_Porto)
             message_fahrenheit_porto = json.dumps(temperatura_fahrenheit_Porto)
 

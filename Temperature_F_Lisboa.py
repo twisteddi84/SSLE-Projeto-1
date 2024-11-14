@@ -10,7 +10,7 @@ city = "Lisboa"
 
 port = 5000
 temperature_measure = "F"
-url = f"http://127.0.0.1:{port}/"
+url = f"http://10.151.101.126:{port}/"
 
 # Global variable to hold the latest temperature in Fahrenheit received
 latest_temperature_fahrenheit = None
@@ -26,7 +26,8 @@ def callback_fahrenheit(ch, method, properties, body):
 
 def consume_temperature_fahrenheit():
     # Connect to RabbitMQ
-    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+    credentials = pika.PlainCredentials('myuser', 'mypassword')
+    connection = pika.BlockingConnection(pika.ConnectionParameters('10.151.101.221', credentials=credentials))
     channel = connection.channel()
 
     # Declare the exchange for temperatures
@@ -53,7 +54,7 @@ def get_data():
 if __name__ == '__main__':
     data = {"type": temperature_measure,"city":city , "url": url}
     print(data)
-    requests.post("http://127.0.0.1:5020/services", data=data)
+    requests.post("http://10.151.101.80:5020/services", data=data)
 
     # Start the RabbitMQ consumer in a separate thread
     consumer_thread = threading.Thread(target=consume_temperature_fahrenheit)

@@ -9,7 +9,7 @@ app = Flask(__name__)
 port = 5001
 temperature_measure = "C"
 city = "Lisboa"
-url = f"http://127.0.0.1:{port}/"
+url = f"http://10.151.101.126:{port}/"
 
 # Variável global para armazenar a última temperatura em Celsius recebida
 latest_temperature_celsius = None
@@ -25,7 +25,8 @@ def callback_celsius(ch, method, properties, body):
 
 def consume_temperature_celsius():
     # Conecta ao RabbitMQ
-    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+    credentials = pika.PlainCredentials('myuser', 'mypassword')
+    connection = pika.BlockingConnection(pika.ConnectionParameters('10.151.101.221', credentials=credentials))
     channel = connection.channel()
 
     # Declara um exchange do tipo 'fanout'
@@ -52,7 +53,7 @@ def get_data():
 if __name__ == '__main__':
     data = {"type": temperature_measure, "city" : city ,  "url": url}
     print(data)
-    requests.post("http://127.0.0.1:5020/services", data=data)
+    requests.post("http://10.151.101.80:5020/services", data=data)
 
     # Inicia o consumidor RabbitMQ em uma thread separada
     consumer_thread = threading.Thread(target=consume_temperature_celsius)
