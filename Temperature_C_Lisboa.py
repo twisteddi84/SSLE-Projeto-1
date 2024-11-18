@@ -14,7 +14,7 @@ city = "Lisboa"
 url = f"http://10.151.101.126:{port}/"
 
 # Configure logging
-log_file_path = "/var/logs/flask/lisboa_temperatures.log"
+log_file_path = "/var/log/flask/lisboa_temperatures.log"
 log_format = '%(h)s %(l)s %(u)s [%(t)s] "%(r)s" %(s)s %(b)s'  # Apache2 common log format
 
 # Custom log formatter to match Apache2 log format
