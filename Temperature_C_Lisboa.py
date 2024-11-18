@@ -15,7 +15,7 @@ url = f"http://10.151.101.126:{port}/"
 
 # Configure logging
 log_file_path = "/var/log/flask/lisboa_temperatures.log"
-log_format = '%(h)s %(l)s %(u)s [%(t)s] "%(r)s" %(s)s %(b)s Headers: %(headers)s'
+log_format = '%(h)s %(l)s %(u)s [%(t)s] "%(r)s" %(s)s %(b)s "%(referer)s" "%(user_agent)s"'
 
 # Custom log formatter to match Apache2 log format
 class ApacheLogFormatter(logging.Formatter):
