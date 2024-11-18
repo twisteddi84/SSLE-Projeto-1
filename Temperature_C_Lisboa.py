@@ -1,8 +1,10 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 import requests
 import pika
 import threading
 import json
+import logging
+from logging.handlers import RotatingFileHandler
 
 app = Flask(__name__)
 
@@ -10,6 +12,45 @@ port = 5001
 temperature_measure = "C"
 city = "Lisboa"
 url = f"http://10.151.101.126:{port}/"
+
+# Configure logging
+log_file_path = "/var/logs/flask/lisboa_temperatures.log"
+log_format = '%(h)s %(l)s %(u)s [%(t)s] "%(r)s" %(s)s %(b)s'  # Apache2 common log format
+
+# Custom log formatter to match Apache2 log format
+class ApacheLogFormatter(logging.Formatter):
+    def format(self, record):
+        record.h = record.__dict__.get('ip', '-')
+        record.l = '-'
+        record.u = '-'
+        record.t = self.formatTime(record, "%d/%b/%Y:%H:%M:%S %z")
+        record.r = record.__dict__.get('request', '-')
+        record.s = record.__dict__.get('status_code', '-')
+        record.b = record.__dict__.get('content_length', '-')
+        return super().format(record)
+    
+
+
+handler = RotatingFileHandler(log_file_path, maxBytes=10*1024*1024, backupCount=5)
+handler.setFormatter(ApacheLogFormatter(log_format))
+app.logger.addHandler(handler)
+app.logger.setLevel(logging.INFO)
+
+def log_request(response):
+    # Extract necessary data for Apache2 log format
+    app.logger.info(
+        '',
+        extra={
+            'ip': request.remote_addr,
+            'request': f"{request.method} {request.path} {request.environ.get('SERVER_PROTOCOL')}",
+            'status_code': response.status_code,
+            'content_length': response.content_length or '-',
+        },
+    )
+    return response
+
+# Apply log_request function after each request
+app.after_request(log_request)
 
 # Variável global para armazenar a última temperatura em Celsius recebida
 latest_temperature_celsius = None
