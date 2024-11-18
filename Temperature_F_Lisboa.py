@@ -1,8 +1,10 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 import requests
 import pika
 import threading
 import json
+import logging
+from logging.handlers import RotatingFileHandler
 
 app = Flask(__name__)
 
@@ -11,6 +13,48 @@ city = "Lisboa"
 port = 5155
 temperature_measure = "F"
 url = f"http://10.151.101.126:{port}/"
+# Configure logging
+log_file_path = "/var/log/flask/lisboa_temperatures.log"
+log_format = '%(h)s %(l)s %(u)s [%(t)s] "%(r)s" %(s)s %(b)s "%(referer)s" "%(user_agent)s"'
+
+# Custom log formatter to match Apache2 log format
+class ApacheLogFormatter(logging.Formatter):
+    def format(self, record):
+        record.h = record.__dict__.get('ip', '-')
+        record.l = '-'
+        record.u = '-'
+        record.t = self.formatTime(record, "%d/%b/%Y:%H:%M:%S %z")
+        record.r = record.__dict__.get('request', '-')
+        record.s = record.__dict__.get('status_code', '-')
+        record.b = record.__dict__.get('content_length', '-')
+        record.referer = record.__dict__.get('referer', '-')
+        record.user_agent = record.__dict__.get('user_agent', '-')
+        return super().format(record)
+    
+
+
+handler = RotatingFileHandler(log_file_path, maxBytes=10*1024*1024, backupCount=5)
+handler.setFormatter(ApacheLogFormatter(log_format))
+app.logger.addHandler(handler)
+app.logger.setLevel(logging.INFO)
+
+def log_request(response):
+    headers = dict(request.headers)
+    app.logger.info(
+        '',
+        extra={
+            'ip': request.remote_addr,
+            'request': f"{request.method} {request.path} {request.environ.get('SERVER_PROTOCOL')}",
+            'status_code': response.status_code,
+            'content_length': response.content_length or '-',
+            'referer': headers.get('Referer', '-'),
+            'user_agent': headers.get('User-Agent', '-'),
+        },
+    )
+    return response
+
+# Apply log_request function after each request
+app.after_request(log_request)
 
 # Global variable to hold the latest temperature in Fahrenheit received
 latest_temperature_fahrenheit = None
