@@ -27,7 +27,8 @@ class ApacheLogFormatter(logging.Formatter):
         record.r = record.__dict__.get('request', '-')
         record.s = record.__dict__.get('status_code', '-')
         record.b = record.__dict__.get('content_length', '-')
-        record.headers = record.__dict__.get('headers', '-')  # Add headers to the format
+        record.referer = record.__dict__.get('referer', '-')
+        record.user_agent = record.__dict__.get('user_agent', '-')
         return super().format(record)
     
 
@@ -38,8 +39,7 @@ app.logger.addHandler(handler)
 app.logger.setLevel(logging.INFO)
 
 def log_request(response):
-    # Extract necessary data for Apache2 log format
-    headers = dict(request.headers)  # Convert headers to a dictionary
+    headers = dict(request.headers)
     app.logger.info(
         '',
         extra={
@@ -47,7 +47,8 @@ def log_request(response):
             'request': f"{request.method} {request.path} {request.environ.get('SERVER_PROTOCOL')}",
             'status_code': response.status_code,
             'content_length': response.content_length or '-',
-            'headers': json.dumps(headers),  # Store headers as a JSON string
+            'referer': headers.get('Referer', '-'),
+            'user_agent': headers.get('User-Agent', '-'),
         },
     )
     return response
