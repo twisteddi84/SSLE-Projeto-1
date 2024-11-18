@@ -15,7 +15,7 @@ url = f"http://10.151.101.126:{port}/"
 
 # Configure logging
 log_file_path = "/var/log/flask/lisboa_temperatures.log"
-log_format = '%(h)s %(l)s %(u)s [%(t)s] "%(r)s" %(s)s %(b)s'  # Apache2 common log format
+log_format = '%(h)s %(l)s %(u)s [%(t)s] "%(r)s" %(s)s %(b)s Headers: %(headers)s'
 
 # Custom log formatter to match Apache2 log format
 class ApacheLogFormatter(logging.Formatter):
@@ -27,6 +27,7 @@ class ApacheLogFormatter(logging.Formatter):
         record.r = record.__dict__.get('request', '-')
         record.s = record.__dict__.get('status_code', '-')
         record.b = record.__dict__.get('content_length', '-')
+        record.headers = record.__dict__.get('headers', '-')  # Add headers to the format
         return super().format(record)
     
 
@@ -38,6 +39,7 @@ app.logger.setLevel(logging.INFO)
 
 def log_request(response):
     # Extract necessary data for Apache2 log format
+    headers = dict(request.headers)  # Convert headers to a dictionary
     app.logger.info(
         '',
         extra={
@@ -45,6 +47,7 @@ def log_request(response):
             'request': f"{request.method} {request.path} {request.environ.get('SERVER_PROTOCOL')}",
             'status_code': response.status_code,
             'content_length': response.content_length or '-',
+            'headers': json.dumps(headers),  # Store headers as a JSON string
         },
     )
     return response
