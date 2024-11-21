@@ -17,13 +17,13 @@ def get_temp(url):
 
 
 def get_all_services():
-    response = requests.get("http://127.0.0.1:5020/services")
+    response = requests.get("http://10.151.101.80:5020/services")
 
     print(response.json())
 
 def get_one_service(id):
     try:
-        response = requests.get(f"http://127.0.0.1:5020/services/{id}")
+        response = requests.get(f"http://10.151.101.80:5020/services/{id}")
 
         # Check if the request was successful (HTTP status code 200)
         if response.status_code == 200:
