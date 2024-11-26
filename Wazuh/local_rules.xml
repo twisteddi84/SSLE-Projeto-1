@@ -1,0 +1,30 @@
+<!-- Local rules -->
+
+<!-- Modify it at your will. -->
+<!-- Copyright (C) 2015, Wazuh Inc. -->
+
+<!-- Example -->
+<group name="attack,">
+  <rule id="100100" level="10">
+    <if_group>web|attack|attacks</if_group>
+    <list field="srcip"
+    lookup="address_match_key">etc/lists/blacklist-alienvault</list>
+    <description>IP address found in AlienVault reputation database.</description>
+  </rule>
+</group>
+
+<group name="ddos attack,">
+  <rule id="100010" level="7">
+    <program_name>example</program_name>
+    <description>DDos Attack ALERT Lisboa</description>
+    <match>Lisboa</match>
+  </rule>
+</group>
+
+<group name="ddos attack,">
+  <rule id="100011" level="7">
+    <program_name>example</program_name>
+    <description>DDos Attack ALERT Porto</description>
+    <match>Porto</match>
+  </rule>
+</group>
